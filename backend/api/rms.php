@@ -12,6 +12,8 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'OPTIONS') {
 
 // Include the database configuration file
 include '../config.php';
+include '../methods/authentication.php';
+
 $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
     http_response_code(500);
@@ -104,16 +106,44 @@ switch ($method) {
 
         // Get Player Token
         $token = trim(substr($headers['Authorization'], 6));
+        $data = json_decode(file_get_contents('php://input'), true);
 
-        // Check if token is listed in the database
-        $playerExists = false;
-        if ($stmt = $conn->prepare("SELECT * FROM `players` WHERE `lastToken` = ?")) {
-            $stmt->bind_param("s", $token);
+        if (!isset($data['accountId']) || !isset($data['goal']) || !isset($data['skips']) || !isset($data['time_survived'])) {
+            http_response_code(403);
+            echo json_encode(["success" => false, "message" => "accountId, goal, skips and time_survived must be indicated in the body"]);
+            $conn->close();
+            die();
+        }
+
+        $accountId = $data['accountId'];
+        $objective = isset($data['objective']) ? $data['objective'] : "author";
+        $goals = $data['goal'];
+        $skips = $data['skips'];
+        $timeSurvived = $data['time_survived'];
+
+        if (!IsTokenValid($token, $openplanetSecret, $conn)) {
+            echo json_encode(["success" => false, "message" => "Invalid / Expired Openplanet token received."]);
+            $conn->close();
+            die();
+        }
+
+        if ($stmt = $conn->prepare("SELECT * FROM `players` WHERE `accountId` = ?")) {
+            $stmt->bind_param("s", $accountId);
             $stmt->execute();
             $result = $stmt->get_result();
-            while($row = $result->fetch_assoc()) {
+
+            if ($result->num_rows === 0) {
+                http_response_code(500);
+                echo json_encode(["success" => false, "message" => "Failed to find player in our database."]);
+                $stmt->close();
+                $conn->close();
+                die();
+            }
+
+            while ($row = $result->fetch_assoc()) {
                 $player = $row;
             }
+            $stmt->close();
         } else {
             http_response_code(500);
             echo json_encode(["success" => false, "message" => "Error preparing statement: " . $conn->error]);
@@ -127,21 +157,6 @@ switch ($method) {
             $conn->close();
             die();
         }
-
-        $data = json_decode(file_get_contents('php://input'), true);
-        $accountId = $player['accountId'];
-        $objective = isset($data['objective']) ? $data['objective'] : "author";
-
-        if (!isset($data['goal']) || !isset($data['skips']) || !isset($data['time_survived'])) {
-            http_response_code(403);
-            echo json_encode(["success" => false, "message" => "goal, skips and time_survived must be indicated in the body"]);
-            $conn->close();
-            die();
-        }
-
-        $goals = $data['goal'];
-        $skips = $data['skips'];
-        $timeSurvived = $data['time_survived'];
 
         $stmt = $conn->prepare("INSERT INTO `rms` (`accountId`, `objective`, `submitTime`, `goals`, `skips`, `timeSurvived`) VALUES (?, ?, now(), ?, ?, ?)");
         $stmt->bind_param("ssiii", $accountId, $objective, $goals, $skips, $timeSurvived);
