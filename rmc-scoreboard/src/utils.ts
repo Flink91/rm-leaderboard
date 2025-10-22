@@ -39,6 +39,12 @@ export const formatNumber = (i: number) => {
     return String(i).padStart(2, "0");
 };
 
+const options: Intl.DateTimeFormatOptions = { weekday: 'long', month: 'long', day: 'numeric', timeZone: 'Europe/Paris', hour: '2-digit', minute: '2-digit', hour12: false };
+
+export const formatDate = (date: Date) => {
+  return date.toLocaleDateString('en-US', options);
+};
+
 // Type guards
 export function isRMC(item: any): item is RecordDataRMC {
     return (item as RecordDataRMC).belowGoals !== undefined;

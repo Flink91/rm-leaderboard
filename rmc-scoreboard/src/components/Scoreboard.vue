@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="flex flex-col md:flex-row gap-2 items-center m-2">
+    <div v-if="!isCompetition" class="flex flex-col md:flex-row gap-2 items-center m-2">
       <h1 class="font-coolvetica text-4xl pl-2 my-2 text-left">
         {{ props.type?.toUpperCase() }} Records
       </h1>
@@ -12,7 +12,7 @@
       <v-icon v-if="loading" name="fa-spinner" fill="white" animation="spin" />
     </div>
 
-    <p class="pl-4">{{ descriptionText }}</p>
+    <p v-if="!isCompetition" class="pl-4">{{ descriptionText }}</p>
       
     <div v-if="paginatedData.length === 0" class="pl-4">
       <p class="italic p-8 text-center">No entries</p>
@@ -103,7 +103,8 @@ import { isRMC, isRMS, formatTimeStamp, formatTimeSurvived, formatRank } from '@
 
 // Define props
 const props = defineProps<{
-  type: 'rmc' | 'rms';
+  type: 'rmc' | 'rms',
+  isCompetition?: boolean
 }>();
 
 // Initialize reactive variables
@@ -205,10 +206,15 @@ const fetchData = async (year: string | null, objective: string | null, category
     rmcData.value = [];
     rmsData.value = [];
     if (props.type === 'rmc') {
-      const response = await axios.get('https://www.flinkblog.de/RMC/api/rmc.php', {
-        params: { year, objective, category }
-      });
-      rmcData.value = response.data;
+      if (props.isCompetition) {
+        const response = await axios.get('https://www.flinkblog.de/RMC/api/breaktherecord.php');
+        rmcData.value = response.data;
+      } else {
+        const response = await axios.get('https://www.flinkblog.de/RMC/api/rmc.php', {
+          params: { year, objective, category }
+        });
+        rmcData.value = response.data;
+      }
     } else {
       const response = await axios.get('https://www.flinkblog.de/RMC/api/rms.php', {
         params: { year, objective, category }
