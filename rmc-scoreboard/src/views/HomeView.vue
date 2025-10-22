@@ -1,5 +1,11 @@
 <template>
   <div class="">
+    <div class="flex justify-center pb-6 px-4 md:px-12">
+      <router-link to="/breaktherecord" class="md:w-4/5 xl:w-1/2 flex justify-center">
+        <img src="@/assets/img/break-banner.webp" class="w-full"/>
+      </router-link>
+    </div>
+
     <div class="flex flex-col xl:flex-row min-h-screen bg-gradient">
       <div class="xl:w-1/2">
         <Scoreboard :type="'rmc'" />
