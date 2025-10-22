@@ -1,11 +1,13 @@
 <template>
   <div>
-    <div class="flex flex-row gap-2 items-center m-2">
+    <div class="flex flex-col md:flex-row gap-2 items-center m-2">
       <h1 class="font-coolvetica text-4xl pl-2 my-2 text-left">
         {{ props.type?.toUpperCase() }} Records
       </h1>
-      <Dropdown :options="options" @update:selected="handleTimeSelection" />
-      <Dropdown :options="optionsObjective" @update:selected="handleObjectiveSelection" />
+      <div class="flex flex-row gap-2 w-full md:w-auto">
+        <Dropdown :options="options" @update:selected="handleTimeSelection" />
+        <Dropdown :options="optionsObjective" @update:selected="handleObjectiveSelection" />
+      </div>
       <v-icon v-if="loading" name="fa-spinner" fill="white" animation="spin" />
     </div>
 
@@ -29,7 +31,7 @@
           </div>
           <div class="flex-shrink-0 w-1/4 flex items-center">
             <v-icon
-              v-if="index === 0 && currentPage === 1"
+              v-visible="index === 0 && currentPage === 1"
               name="fa-trophy"
               fill="gold"
               animation="pulse"
@@ -66,7 +68,7 @@
           </div>
         </div>
         <div class="flex items-center justify-between md:w-1/8 mt-2 md:mt-0 self-end">
-          <span v-if="item.videoLink"><a :href="item.videoLink" target="_blank">   <v-icon name="fa-play-circle" fill="gold" /></a></span>
+          <span v-visible="item.videoLink"><a :href="item.videoLink" target="_blank">   <v-icon name="fa-play-circle" fill="gold" /></a></span>
           <div class="flex-shrink-0 w-1/12 items-center justify-end hidden md:flex">
             <!-- space for icon links -->
           </div>
@@ -74,10 +76,10 @@
       </div>
     </div>
     
-    <div class="flex justify-between p-4">
-      <button v-if="currentPage > 1" @click="prevPage">Previous</button>
-      <span v-if="totalPages > 1">Page {{ currentPage }} of {{ totalPages }} ({{ sortedData.length }} results)</span>
-      <button v-if="currentPage < totalPages" @click="nextPage">Next</button>
+    <div v-if="paginatedData.length > 0" class="flex justify-between p-4">
+      <button v-visible="currentPage > 1" @click="prevPage">Previous</button>
+      <span>Page {{ currentPage }} of {{ totalPages }} ({{ sortedData.length }} results)</span>
+      <button v-visible="currentPage < totalPages" @click="nextPage">Next</button>
     </div>
   </div>
 </template>
