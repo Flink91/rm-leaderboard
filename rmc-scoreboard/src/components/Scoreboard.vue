@@ -114,7 +114,7 @@ const years = Array.from({ length: currentYear - 2021 + 1 }, (_, i) =>
 );
 
 const options = ref([...years, 'all']);
-const optionsObjective = ref(['author', 'gold', 'silver', 'bronze', 'wr']);
+const optionsObjective = ref(['author', 'gold', 'silver', 'bronze', 'WR']);
 const optionsCategories = ref(['standard', 'classic']);
 
 const selectedTime = ref<string | null>(currentYear.toString());
@@ -229,7 +229,7 @@ const fetchData = async (year: string | null, objective: string | null, category
 };
 
 const objectiveImages = computed(() => {
-  switch (selectedObjective.value) {
+  switch (selectedObjective.value?.toLowerCase()) {
     case 'gold':
       return { at: goldImage, secondary: silverImage };
     case 'silver':
