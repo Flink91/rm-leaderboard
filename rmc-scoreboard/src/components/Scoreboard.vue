@@ -25,7 +25,7 @@
       >
         <div class="flex items-center justify-between md:justify-start md:w-full">
           <div class="flex-shrink-0 w-1/12 flex items-center">
-            <span>{{ (currentPage - 1) * itemsPerPage + index + 1 }}</span>
+            <span>{{ formatRank((currentPage - 1) * itemsPerPage + index + 1) }}</span>
           </div>
           <div class="flex-shrink-0 w-1/4 flex items-center">
             <v-icon
@@ -96,7 +96,7 @@ import silverImage from '@/assets/img/silver.png';
 import bronzeImage from '@/assets/img/bronze.png';
 import skipImage from '@/assets/img/skip.png';
 import wrImage from '@/assets/img/wr.png';
-import { isRMC, isRMS, formatTimeStamp, formatTimeSurvived } from '@/utils';
+import { isRMC, isRMS, formatTimeStamp, formatTimeSurvived, formatRank } from '@/utils';
 
 // Define props
 const props = defineProps<{
