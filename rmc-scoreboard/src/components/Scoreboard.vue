@@ -1,15 +1,18 @@
 <template>
   <div>
-    <div class="flex flex-row gap-2 items-center m-2">
+    <div v-if="!isCompetition" class="flex flex-col md:flex-row gap-2 items-center m-2">
       <h1 class="font-coolvetica text-4xl pl-2 my-2 text-left">
         {{ props.type?.toUpperCase() }} Records
       </h1>
-      <Dropdown :options="options" @update:selected="handleTimeSelection" />
-      <Dropdown :options="optionsObjective" @update:selected="handleObjectiveSelection" />
+      <div class="flex flex-row gap-2 w-full md:w-auto">
+        <Dropdown :options="options" @update:selected="handleTimeSelection" />
+        <Dropdown :options="optionsObjective" @update:selected="handleObjectiveSelection" />
+        <Dropdown :options="optionsCategories" @update:selected="handleCategorySelection" />
+      </div>
       <v-icon v-if="loading" name="fa-spinner" fill="white" animation="spin" />
     </div>
 
-    <p class="pl-4">{{ descriptionText }}</p>
+    <p v-if="!isCompetition" class="pl-4">{{ descriptionText }}</p>
       
     <div v-if="paginatedData.length === 0" class="pl-4">
       <p class="italic p-8 text-center">No entries</p>
@@ -25,11 +28,11 @@
       >
         <div class="flex items-center justify-between md:justify-start md:w-full">
           <div class="flex-shrink-0 w-1/12 flex items-center">
-            <span>{{ (currentPage - 1) * itemsPerPage + index + 1 }}</span>
+            <span>{{ formatRank((currentPage - 1) * itemsPerPage + index + 1) }}</span>
           </div>
           <div class="flex-shrink-0 w-1/4 flex items-center">
             <v-icon
-              v-if="index === 0 && currentPage === 1"
+              v-visible="index === 0 && currentPage === 1"
               name="fa-trophy"
               fill="gold"
               animation="pulse"
@@ -43,7 +46,7 @@
             <span>{{ item.goals }}</span>
             
             <!-- For 'rmc' type -->
-            <template v-if="props.type === 'rmc'">
+            <template v-if="props.type === 'rmc' && selectedObjective != 'bronze'">
               <img :src="objectiveImages.secondary" class="h-6 mx-2" />
               <span>{{ isRMC(item) ? item.belowGoals : '' }}</span>
             </template>
@@ -66,7 +69,7 @@
           </div>
         </div>
         <div class="flex items-center justify-between md:w-1/8 mt-2 md:mt-0 self-end">
-          <span v-if="item.videoLink"><a :href="item.videoLink" target="_blank">   <v-icon name="fa-play-circle" fill="gold" /></a></span>
+          <span v-visible="item.videoLink"><a :href="item.videoLink" target="_blank">   <v-icon name="fa-play-circle" fill="gold" /></a></span>
           <div class="flex-shrink-0 w-1/12 items-center justify-end hidden md:flex">
             <!-- space for icon links -->
           </div>
@@ -74,10 +77,10 @@
       </div>
     </div>
     
-    <div class="flex justify-between p-4">
-      <button v-if="currentPage > 1" @click="prevPage">Previous</button>
-      <span v-if="totalPages > 1">Page {{ currentPage }} of {{ totalPages }} ({{ sortedData.length }} results)</span>
-      <button v-if="currentPage < totalPages" @click="nextPage">Next</button>
+    <div v-if="paginatedData.length > 0" class="flex justify-between p-4">
+      <button v-visible="currentPage > 1" @click="prevPage">Previous</button>
+      <span>Page {{ currentPage }} of {{ totalPages }} ({{ sortedData.length }} results)</span>
+      <button v-visible="currentPage < totalPages" @click="nextPage">Next</button>
     </div>
   </div>
 </template>
@@ -96,11 +99,12 @@ import silverImage from '@/assets/img/silver.png';
 import bronzeImage from '@/assets/img/bronze.png';
 import skipImage from '@/assets/img/skip.png';
 import wrImage from '@/assets/img/wr.png';
-import { isRMC, isRMS, formatTimeStamp, formatTimeSurvived } from '@/utils';
+import { isRMC, isRMS, formatTimeStamp, formatTimeSurvived, formatRank } from '@/utils';
 
 // Define props
 const props = defineProps<{
-  type: 'rmc' | 'rms';
+  type: 'rmc' | 'rms',
+  isCompetition?: boolean
 }>();
 
 // Initialize reactive variables
@@ -110,10 +114,12 @@ const years = Array.from({ length: currentYear - 2021 + 1 }, (_, i) =>
 );
 
 const options = ref([...years, 'all']);
-const optionsObjective = ref(['author', 'gold', 'silver', 'bronze', 'wr']);
+const optionsObjective = ref(['author', 'gold', 'silver', 'bronze', 'WR']);
+const optionsCategories = ref(['standard', 'classic']);
 
 const selectedTime = ref<string | null>(currentYear.toString());
 const selectedObjective = ref<string | null>('author');
+const selectedCategory = ref<string | null>('standard');
 
 const loading = ref(false);
 const rmcData = ref<RecordDataRMC[]>([]);
@@ -194,19 +200,24 @@ const prevPage = () => {
 };
 
 // Fetch data from API
-const fetchData = async (year: string | null, objective: string | null) => {
+const fetchData = async (year: string | null, objective: string | null, category: string | null) => {
   loading.value = true;
   try {
     rmcData.value = [];
     rmsData.value = [];
     if (props.type === 'rmc') {
-      const response = await axios.get('https://www.flinkblog.de/RMC/api/rmc.php', {
-        params: { year, objective }
-      });
-      rmcData.value = response.data;
+      if (props.isCompetition) {
+        const response = await axios.get('https://www.flinkblog.de/RMC/api/breaktherecord.php');
+        rmcData.value = response.data;
+      } else {
+        const response = await axios.get('https://www.flinkblog.de/RMC/api/rmc.php', {
+          params: { year, objective, category }
+        });
+        rmcData.value = response.data;
+      }
     } else {
       const response = await axios.get('https://www.flinkblog.de/RMC/api/rms.php', {
-        params: { year, objective }
+        params: { year, objective, category }
       });
       rmsData.value = response.data;
     }
@@ -218,7 +229,7 @@ const fetchData = async (year: string | null, objective: string | null) => {
 };
 
 const objectiveImages = computed(() => {
-  switch (selectedObjective.value) {
+  switch (selectedObjective.value?.toLowerCase()) {
     case 'gold':
       return { at: goldImage, secondary: silverImage };
     case 'silver':
@@ -234,26 +245,31 @@ const objectiveImages = computed(() => {
 // Event handlers
 const handleTimeSelection = (selected: string) => {
   selectedTime.value = selected;
-  fetchData(selectedTime.value, selectedObjective.value);
+  fetchData(selectedTime.value, selectedObjective.value, selectedCategory.value);
 };
 
 const handleObjectiveSelection = (selected: string) => {
   selectedObjective.value = selected;
-  fetchData(selectedTime.value, selectedObjective.value);
+  fetchData(selectedTime.value, selectedObjective.value, selectedCategory.value);
 };
+
+const handleCategorySelection = (selected: string) => {
+  selectedCategory.value = selected;
+  fetchData(selectedTime.value, selectedObjective.value, selectedCategory.value);
+}
 
 const descriptionText = computed(() => {
   return props.type === 'rmc'
     ? 'Collect as many medals as possible within an hour!'
-    : 'Survive as long as you can, every Author medal replenishes your timer!';
+    : 'Survive as long as you can, every goal medal replenishes your timer!';
 });
 
 // Watchers
 onMounted(() => {
-  fetchData(selectedTime.value, selectedObjective.value);
+  fetchData(selectedTime.value, selectedObjective.value, selectedCategory.value);
 });
 
-watch([selectedTime, selectedObjective], ([newTime, newObjective]) => {
-  fetchData(newTime, newObjective);
+watch([selectedTime, selectedObjective, selectedCategory], ([newTime, newObjective, newCategory]) => {
+  fetchData(newTime, newObjective, newCategory);
 });
 </script>

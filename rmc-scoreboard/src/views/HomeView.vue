@@ -1,5 +1,11 @@
 <template>
   <div class="">
+    <div class="flex justify-center pb-6 px-4 md:px-12">
+      <router-link to="/breaktherecord" class="md:w-4/5 xl:w-1/2 flex justify-center">
+        <img src="@/assets/img/break-banner.webp" class="w-full"/>
+      </router-link>
+    </div>
+
     <div class="flex flex-col xl:flex-row min-h-screen bg-gradient">
       <div class="xl:w-1/2">
         <Scoreboard :type="'rmc'" />
@@ -53,69 +59,3 @@ import Howto from '@/components/Howto.vue';
 import About from '@/components/About.vue';
 import Videos from '@/components/Videos.vue';
 </script>
-
-<style scoped>
-.bg-footer {
-  background-color: #000e27;
-  opacity: 0.8;
-  background-image: linear-gradient(
-      30deg,
-      #01060e 12%,
-      transparent 12.5%,
-      transparent 87%,
-      #01060e 87.5%,
-      #01060e
-    ),
-    linear-gradient(150deg, #01060e 12%, transparent 12.5%, transparent 87%, #01060e 87.5%, #01060e),
-    linear-gradient(30deg, #01060e 12%, transparent 12.5%, transparent 87%, #01060e 87.5%, #01060e),
-    linear-gradient(150deg, #01060e 12%, transparent 12.5%, transparent 87%, #01060e 87.5%, #01060e),
-    linear-gradient(
-      60deg,
-      #01060e77 25%,
-      transparent 25.5%,
-      transparent 75%,
-      #01060e77 75%,
-      #01060e77
-    ),
-    linear-gradient(
-      60deg,
-      #01060e77 25%,
-      transparent 25.5%,
-      transparent 75%,
-      #01060e77 75%,
-      #01060e77
-    );
-  background-size: 26px 46px;
-  background-position:
-    0 0,
-    0 0,
-    13px 23px,
-    13px 23px,
-    0 0,
-    13px 23px;
-}
-.bg-gradient {
-  background: linear-gradient(to bottom, #000e27 50%, #112429 100%);
-}
-.bg-color {
-  background: #000e27;
-}
-
-.bg-pattern {
-  background-color: #ffffff;
-  opacity: 0.8;
-  background-image: linear-gradient(#f6f6ff 2px, transparent 2px),
-    linear-gradient(90deg, #f6f6ff 2px, transparent 2px),
-    linear-gradient(#f6f6ff 1px, transparent 1px), linear-gradient(90deg, #f6f6ff 1px, #ffffff 1px);
-  background-size:
-    50px 50px,
-    50px 50px,
-    10px 10px,
-    10px 10px;
-  background-position:
-    -2px -2px,
-    -2px -2px,
-    -1px -1px,
-    -1px -1px;
-}
-</style>

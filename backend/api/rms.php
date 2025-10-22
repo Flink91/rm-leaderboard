@@ -29,6 +29,7 @@ switch ($method) {
         // Get the time parameter from the query string
         $time = isset($_GET['year']) ? $_GET['year'] : 'all';
         $objective = isset($_GET['objective']) ? $_GET['objective'] : 'author';
+        $category = isset($_GET['category']) ? $_GET['category'] : 'standard';
 
         if ($time !== 'all') {
             // Query for a specific year
@@ -39,12 +40,12 @@ switch ($method) {
                 INNER JOIN (
                     SELECT `accountId`, MAX(`goals`) AS maxGoals
                     FROM `rms`
-                    WHERE `objective` = ? AND YEAR(`submitTime`) = ?
+                    WHERE `objective` = ? AND YEAR(`submitTime`) = ? AND `category` = ?
                     GROUP BY `accountId`
                 ) AS best_runs ON `rms`.`accountId` = best_runs.`accountId`
                 AND `rms`.`goals` = best_runs.`maxGoals`
                 WHERE YEAR(`rms`.`submitTime`) = ?
-                ORDER BY `rms`.`goals` DESC, `rms`.`skips` ASC, `rms`.`timeSurvived` DESC;
+                ORDER BY `rms`.`goals` DESC, `rms`.`skips` ASC, `rms`.`timeSurvived` DESC, `rms`.`submitTime` ASC;
             ";
         } else {
             // Query across all years
@@ -55,20 +56,20 @@ switch ($method) {
                 INNER JOIN (
                     SELECT `accountId`, MAX(`goals`) AS maxGoals
                     FROM `rms`
-                    WHERE `objective` = ?
+                    WHERE `objective` = ? AND `category` = ?
                     GROUP BY `accountId`
                 ) AS best_runs ON `rms`.`accountId` = best_runs.`accountId`
                 AND `rms`.`goals` = best_runs.`maxGoals`
-                ORDER BY `rms`.`goals` DESC, `rms`.`skips` ASC, `rms`.`timeSurvived` DESC;
+                ORDER BY `rms`.`goals` DESC, `rms`.`skips` ASC, `rms`.`timeSurvived` DESC, `rms`.`submitTime` ASC;
             ";
         }
 
         // Prepare the statement
         if ($stmt = $conn->prepare($sql)) {
             if ($time !== 'all') {
-                $stmt->bind_param("sii", $objective, $time, $time);
+                $stmt->bind_param("sisi", $objective, $time, $category, $time);
             } else {
-                $stmt->bind_param("s", $objective);
+                $stmt->bind_param("ss", $objective, $category);
             }
             $stmt->execute();
             $result = $stmt->get_result();
@@ -117,6 +118,7 @@ switch ($method) {
 
         $accountId = $data['accountId'];
         $objective = isset($data['objective']) ? $data['objective'] : "author";
+        $category = isset($data['category']) ? $data['category'] : "standard";
         $goals = $data['goal'];
         $skips = $data['skips'];
         $timeSurvived = $data['time_survived'];
@@ -158,8 +160,8 @@ switch ($method) {
             die();
         }
 
-        $stmt = $conn->prepare("INSERT INTO `rms` (`accountId`, `objective`, `submitTime`, `goals`, `skips`, `timeSurvived`) VALUES (?, ?, now(), ?, ?, ?)");
-        $stmt->bind_param("ssiii", $accountId, $objective, $goals, $skips, $timeSurvived);
+        $stmt = $conn->prepare("INSERT INTO `rms` (`accountId`, `objective`, `submitTime`, `goals`, `skips`, `timeSurvived`, `category`) VALUES (?, ?, UTC_TIMESTAMP(), ?, ?, ?, ?)");
+        $stmt->bind_param("ssiiis", $accountId, $objective, $goals, $skips, $timeSurvived, $category);
 
         if ($stmt->execute()) {
             echo json_encode(["success" => true, "message" => "RMS run was uploaded successfully to the leaderboard"]);

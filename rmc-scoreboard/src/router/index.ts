@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import HomeView from '../views/HomeView.vue';
+import CompetitionView from '@/views/CompetitionView.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -10,6 +11,11 @@ const router = createRouter({
       component: HomeView
     },
     {
+      path: '/breaktherecord',
+      name: 'breaktherecord',
+      component: CompetitionView
+    },
+    {
       path: '/about',
       name: 'about',
       // route level code-splitting
@@ -17,7 +23,13 @@ const router = createRouter({
       // which is lazy-loaded when the route is visited.
       component: () => import('../views/AboutView.vue')
     }
-  ]
+  ],
+  scrollBehavior(to, from, savedPosition) {
+    if (to.hash) {
+      return { el: to.hash };
+    }
+    return { top: 0 };
+  }
 });
 
 export default router;

@@ -16,6 +16,35 @@ export const formatTimeSurvived = (seconds: number) => {
     return `${hours}h ${minutes}m ${secs}s`;
 };
 
+export const formatRank = (i: number) => {
+    const j = i % 10;
+    const k = i % 100;
+
+    if (j === 1 && k !== 11) {
+        return i + "st";
+    }
+
+    if (j === 2 && k !== 12) {
+        return i + "nd";
+    }
+
+    if (j === 3 && k !== 13) {
+        return i + "rd";
+    }
+
+    return i + "th";
+};
+
+export const formatNumber = (i: number) => {
+    return String(i).padStart(2, "0");
+};
+
+const options: Intl.DateTimeFormatOptions = { weekday: 'long', month: 'long', day: 'numeric', timeZone: 'Europe/Paris', hour: '2-digit', minute: '2-digit', hour12: false };
+
+export const formatDate = (date: Date) => {
+  return date.toLocaleDateString('en-US', options);
+};
+
 // Type guards
 export function isRMC(item: any): item is RecordDataRMC {
     return (item as RecordDataRMC).belowGoals !== undefined;
