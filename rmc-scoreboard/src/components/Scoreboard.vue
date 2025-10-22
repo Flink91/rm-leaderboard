@@ -245,7 +245,7 @@ const handleObjectiveSelection = (selected: string) => {
 const descriptionText = computed(() => {
   return props.type === 'rmc'
     ? 'Collect as many medals as possible within an hour!'
-    : 'Survive as long as you can, every Author medal replenishes your timer!';
+    : 'Survive as long as you can, every goal medal replenishes your timer!';
 });
 
 // Watchers
