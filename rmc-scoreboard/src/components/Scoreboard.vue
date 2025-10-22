@@ -46,7 +46,7 @@
             <span>{{ item.goals }}</span>
             
             <!-- For 'rmc' type -->
-            <template v-if="props.type === 'rmc'">
+            <template v-if="props.type === 'rmc' && selectedObjective != 'bronze'">
               <img :src="objectiveImages.secondary" class="h-6 mx-2" />
               <span>{{ isRMC(item) ? item.belowGoals : '' }}</span>
             </template>
