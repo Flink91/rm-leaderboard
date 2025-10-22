@@ -7,6 +7,7 @@
       <div class="flex flex-row gap-2 w-full md:w-auto">
         <Dropdown :options="options" @update:selected="handleTimeSelection" />
         <Dropdown :options="optionsObjective" @update:selected="handleObjectiveSelection" />
+        <Dropdown :options="optionsCategories" @update:selected="handleCategorySelection" />
       </div>
       <v-icon v-if="loading" name="fa-spinner" fill="white" animation="spin" />
     </div>
@@ -113,9 +114,11 @@ const years = Array.from({ length: currentYear - 2021 + 1 }, (_, i) =>
 
 const options = ref([...years, 'all']);
 const optionsObjective = ref(['author', 'gold', 'silver', 'bronze', 'wr']);
+const optionsCategories = ref(['standard', 'classic']);
 
 const selectedTime = ref<string | null>(currentYear.toString());
 const selectedObjective = ref<string | null>('author');
+const selectedCategory = ref<string | null>('standard');
 
 const loading = ref(false);
 const rmcData = ref<RecordDataRMC[]>([]);
@@ -196,19 +199,19 @@ const prevPage = () => {
 };
 
 // Fetch data from API
-const fetchData = async (year: string | null, objective: string | null) => {
+const fetchData = async (year: string | null, objective: string | null, category: string | null) => {
   loading.value = true;
   try {
     rmcData.value = [];
     rmsData.value = [];
     if (props.type === 'rmc') {
       const response = await axios.get('https://www.flinkblog.de/RMC/api/rmc.php', {
-        params: { year, objective }
+        params: { year, objective, category }
       });
       rmcData.value = response.data;
     } else {
       const response = await axios.get('https://www.flinkblog.de/RMC/api/rms.php', {
-        params: { year, objective }
+        params: { year, objective, category }
       });
       rmsData.value = response.data;
     }
@@ -236,13 +239,18 @@ const objectiveImages = computed(() => {
 // Event handlers
 const handleTimeSelection = (selected: string) => {
   selectedTime.value = selected;
-  fetchData(selectedTime.value, selectedObjective.value);
+  fetchData(selectedTime.value, selectedObjective.value, selectedCategory.value);
 };
 
 const handleObjectiveSelection = (selected: string) => {
   selectedObjective.value = selected;
-  fetchData(selectedTime.value, selectedObjective.value);
+  fetchData(selectedTime.value, selectedObjective.value, selectedCategory.value);
 };
+
+const handleCategorySelection = (selected: string) => {
+  selectedCategory.value = selected;
+  fetchData(selectedTime.value, selectedObjective.value, selectedCategory.value);
+}
 
 const descriptionText = computed(() => {
   return props.type === 'rmc'
@@ -252,10 +260,10 @@ const descriptionText = computed(() => {
 
 // Watchers
 onMounted(() => {
-  fetchData(selectedTime.value, selectedObjective.value);
+  fetchData(selectedTime.value, selectedObjective.value, selectedCategory.value);
 });
 
-watch([selectedTime, selectedObjective], ([newTime, newObjective]) => {
-  fetchData(newTime, newObjective);
+watch([selectedTime, selectedObjective, selectedCategory], ([newTime, newObjective, newCategory]) => {
+  fetchData(newTime, newObjective, newCategory);
 });
 </script>
