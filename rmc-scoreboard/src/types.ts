@@ -3,7 +3,8 @@ export interface RecordDataRMC {
     submitTime: string;
     displayName: string;
     accountId: string;
-    objective: 'author' | 'gold' | 'silver' | 'bronze';
+    objective: 'wr' | 'author' | 'gold' | 'silver' | 'bronze';
+    category: 'classic' | 'standard';
     goals: number;
     belowGoals: number;
     skips?: number;
@@ -14,7 +15,8 @@ export interface RecordDataRMS {
     submitTime: string;
     displayName: string;
     accountId: string;
-    objective: 'author' | 'gold' | 'silver' | 'bronze';
+    objective: 'wr' | 'author' | 'gold' | 'silver' | 'bronze';
+    category: 'classic' | 'standard';
     goals: number;
     skips: number;
     timeSurvived: number;
