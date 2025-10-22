@@ -159,7 +159,7 @@ switch ($method) {
             die();
         }
 
-        $stmt = $conn->prepare("INSERT INTO `rmc` (`accountId`, `objective`, `submitTime`, `goals`, `belowGoals`, `category`) VALUES (?, ?, now(), ?, ?, ?)");
+        $stmt = $conn->prepare("INSERT INTO `rmc` (`accountId`, `objective`, `submitTime`, `goals`, `belowGoals`, `category`) VALUES (?, ?, UTC_TIMESTAMP(), ?, ?, ?)");
         $stmt->bind_param("ssiis", $accountId, $objective, $goals, $belowGoals, $category);
 
         if ($stmt->execute()) {

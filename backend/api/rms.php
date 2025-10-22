@@ -160,7 +160,7 @@ switch ($method) {
             die();
         }
 
-        $stmt = $conn->prepare("INSERT INTO `rms` (`accountId`, `objective`, `submitTime`, `goals`, `skips`, `timeSurvived`, `category`) VALUES (?, ?, now(), ?, ?, ?, ?)");
+        $stmt = $conn->prepare("INSERT INTO `rms` (`accountId`, `objective`, `submitTime`, `goals`, `skips`, `timeSurvived`, `category`) VALUES (?, ?, UTC_TIMESTAMP(), ?, ?, ?, ?)");
         $stmt->bind_param("ssiiis", $accountId, $objective, $goals, $skips, $timeSurvived, $category);
 
         if ($stmt->execute()) {
