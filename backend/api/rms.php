@@ -45,7 +45,7 @@ switch ($method) {
                 ) AS best_runs ON `rms`.`accountId` = best_runs.`accountId`
                 AND `rms`.`goals` = best_runs.`maxGoals`
                 WHERE YEAR(`rms`.`submitTime`) = ?
-                ORDER BY `rms`.`goals` DESC, `rms`.`skips` ASC, `rms`.`timeSurvived` DESC;
+                ORDER BY `rms`.`goals` DESC, `rms`.`skips` ASC, `rms`.`timeSurvived` DESC, `rms`.`submitTime` ASC;
             ";
         } else {
             // Query across all years
@@ -60,7 +60,7 @@ switch ($method) {
                     GROUP BY `accountId`
                 ) AS best_runs ON `rms`.`accountId` = best_runs.`accountId`
                 AND `rms`.`goals` = best_runs.`maxGoals`
-                ORDER BY `rms`.`goals` DESC, `rms`.`skips` ASC, `rms`.`timeSurvived` DESC;
+                ORDER BY `rms`.`goals` DESC, `rms`.`skips` ASC, `rms`.`timeSurvived` DESC, `rms`.`submitTime` ASC;
             ";
         }
 
