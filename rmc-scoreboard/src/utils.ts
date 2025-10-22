@@ -35,6 +35,10 @@ export const formatRank = (i: number) => {
     return i + "th";
 };
 
+export const formatNumber = (i: number) => {
+    return String(i).padStart(2, "0");
+};
+
 // Type guards
 export function isRMC(item: any): item is RecordDataRMC {
     return (item as RecordDataRMC).belowGoals !== undefined;
