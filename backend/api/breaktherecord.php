@@ -37,6 +37,9 @@ switch ($method) {
                 GROUP BY `accountId`
             ) AS best_runs ON `rmc`.`accountId` = best_runs.`accountId`
             AND `rmc`.`goals` = best_runs.`maxGoals`
+            WHERE rmc.objective = 'author'
+                AND rmc.category = 'standard'
+                AND rmc.submitTime BETWEEN '2025-10-25 18:00:00' AND '2025-10-31 22:59:59'
             ORDER BY `rmc`.`goals` DESC, `rmc`.`belowGoals` DESC, `rmc`.`submitTime` ASC;
         ";
 
