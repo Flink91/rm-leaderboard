@@ -5,7 +5,7 @@
     <p class="text-base md:text-2xl px-7 my-5 text-center">During the competition, players will battle to earn as many ATs as possible within an hour under the new rules. Once the timer runs out, the top four players on the leaderboard will share a prize pool of 1000€!</p>
     <div class="flex flex-col xl:flex-row justify-center items-center m-4 bg-color font-coolvetica">
       <div class="flex justify-center h-[80vh] xl:h-1/2">
-        <img src="@/assets/img/break-info.webp" class="px-10" />
+        <img src="@/assets/img/break-info.webp" class="xl:px-10" />
       </div>
       <div class="lg:w-3/4 py-3">
         <div class="flex justify-center flex-row flex-wrap">
@@ -26,7 +26,7 @@
     </div>
   </div>
 
-  <div class="flex flex-col lg:flex-row lg:gap-16 p-12 bg-pattern font-coolvetica text-xl text-gray-900">
+  <div class="flex flex-col lg:flex-row lg:gap-16 p-6 lg:p-12 bg-pattern font-coolvetica text-xl text-gray-900">
     <div class="lg:w-1/2">
       <h1 class="text-4xl my-2 text-left">Details</h1>
       <ul class="list-disc list-inside pl-4 pb-4">
